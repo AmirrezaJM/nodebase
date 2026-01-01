@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -157,6 +157,61 @@ export function SignupForm() {
                         >
                             {isPending ? "Creating account..." : "Sign up"}
                         </Button>
+
+                        <div className="relative w-full">
+                            <div className="absolute inset-0 flex items-center">
+                                <span className="w-full border-t" />
+                            </div>
+                            <div className="relative flex justify-center text-xs uppercase">
+                                <span className="bg-card px-2 text-muted-foreground">
+                                    or continue with
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4 w-full">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                disabled={isPending}
+                                onClick={() => {
+                                    authClient.signIn.social({
+                                        provider: "google",
+                                        callbackURL: "/",
+                                    });
+                                }}
+                            >
+                                <Image
+                                    src="/logo/google.svg"
+                                    alt="Google"
+                                    width={20}
+                                    height={20}
+                                    className="mr-2"
+                                />
+                                Google
+                            </Button>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                disabled={isPending}
+                                onClick={() => {
+                                    authClient.signIn.social({
+                                        provider: "github",
+                                        callbackURL: "/",
+                                    });
+                                }}
+                            >
+                                <Image
+                                    src="/logo/github.svg"
+                                    alt="GitHub"
+                                    width={20}
+                                    height={20}
+                                    className="mr-2"
+                                />
+                                GitHub
+                            </Button>
+                        </div>
+
                         <p className="text-sm text-center text-muted-foreground">
                             Already have an account?{" "}
                             <Link
