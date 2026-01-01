@@ -1,8 +1,15 @@
 import { z } from "zod/v4";
-import { createTRPCRouter, protectedProcedure } from "../init";
+import { baseProcedure, createTRPCRouter, protectedProcedure } from "../init";
 import prisma from "@/lib/db";
+import { inngestClient } from "@/inngest/client";
 
 export const appRouter = createTRPCRouter({
+    testai: baseProcedure.mutation(async () => {
+        await inngestClient.send({
+            name: "execute/ai",
+        });
+        return {sucess: true, message: "AI executed successfully"}
+    }),
     getWorkflows: protectedProcedure.query((ctx) => {
         return prisma.workflow.findMany();
     }),
