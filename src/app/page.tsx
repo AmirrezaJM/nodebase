@@ -28,3 +28,4 @@ export default async function Home() {
 // ask this question can the unauth user access this page or not if yes 
 // TRPC data access layer is protected and check authProtection checks within server component to redirect
 // Last level of security is trpc not middleware or in here auth-utils
+// sentray for Error tracking and monitoring of users what they are doing on the website(anonymously)
