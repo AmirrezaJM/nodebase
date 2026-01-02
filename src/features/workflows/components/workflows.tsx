@@ -1,9 +1,27 @@
 "use client";
-import { EntityContainer, EntityHeader } from "@/components/entity-components";
+import { EntityContainer, EntityHeader, EntityPagination, EntitySearch } from "@/components/entity-components";
 import { useCreateWorkflow, useSuspenseWorkflow } from "../hooks/use-workflow";
 import { useUpgradeModal } from "@/hooks/use-upgrade-modal";
-import { router } from "better-auth/api";
 import { useRouter } from "next/navigation";
+import { useWorkflowsParams } from "../hooks/use-workflows-params";
+import { useEntitySearch } from "@/hooks/use-entity-search";
+
+
+export const WorkflowsSearch = () => {
+    const [params, setParams] = useWorkflowsParams();
+    const {searchValue, onSearchChange} = useEntitySearch({
+        params,
+        setParams,
+    });
+    return (
+        <EntitySearch
+            placeholder="Search workflows"
+            value={searchValue}
+            onChange={onSearchChange}
+        />
+    );
+}
+
 export const WorkflowsList = () => {
     const workflows = useSuspenseWorkflow();
     return (
@@ -46,10 +64,23 @@ export const WorkflowsHeader = ({ disabled, isCreating }: { disabled?: boolean, 
     ); 
 }
 
+export const WorkflowsPagination = () => {
+    const workflows = useSuspenseWorkflow();
+    const [params, setParams] = useWorkflowsParams();
+    return (
+        <EntityPagination
+            disabled={workflows.isPending}
+            page={workflows.data.page}
+            totalPages={workflows.data.totalPages}
+            onPageChange={(page) => setParams({...params, page})}
+        />
+    );
+}
+
 
 export const WorkflowsContainer = ({ children }: { children: React.ReactNode }) => {
     return (
-        <EntityContainer header={<WorkflowsHeader />} search={<></>} pagination={<></>}>
+        <EntityContainer header={<WorkflowsHeader />} search={<WorkflowsSearch />} pagination={<WorkflowsPagination />}>
             {children}
         </EntityContainer>
     );
