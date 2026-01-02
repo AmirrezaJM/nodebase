@@ -3,6 +3,7 @@ import { cache } from "react";
 import prisma from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { polarClient } from "@/lib/polar";
 
 /**
  * Creates the tRPC context for each request.
@@ -41,4 +42,17 @@ export const protectedProcedure = baseProcedure.use(async ({ ctx, next }) => {
         });
     }
     return next({ctx: {...ctx, auth: session}});
+});
+
+export const premiumProcedure = protectedProcedure.use(async ({ ctx, next }) => {
+    const customer = await polarClient.customers.getStateExternal({
+        externalId: ctx.auth.user.id,
+    });
+    if(!customer.activeSubscriptions || customer.activeSubscriptions.length === 0) {
+        throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Premium required",
+        });
+    }
+    return next({ctx: {...ctx, customer}});
 });

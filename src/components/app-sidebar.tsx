@@ -9,6 +9,7 @@ import { usePathname, useRouter } from "next/navigation";
 
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import { authClient } from "@/lib/auth-client";
+import { useHasActiveSubscription } from "@/features/subscriptions/hooks/use-subscriptions";
 
 
 const menultems = [
@@ -25,6 +26,7 @@ const menultems = [
 export const AppSidebar = () => {
     const router = useRouter();
     const pathname = usePathname();
+    const { hasActiveSubscription, isLoading } = useHasActiveSubscription();
     return (
         <Sidebar collapsible="icon">
             <SidebarHeader>
@@ -59,14 +61,16 @@ export const AppSidebar = () => {
             </SidebarContent>
             <SidebarFooter>
                 <SidebarMenu>
+                    {!hasActiveSubscription && !isLoading && (
+                        < SidebarMenuItem >
+                            <SidebarMenuButton tooltip="Upgrade to Pro" className="gap-x-4 h-10 px-4" onClick={() => authClient.checkout({ slug: "nodebase-Pro" })}>
+                                <StarIcon className="size-4" />
+                                Upgrade to Pro
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    )}
                     <SidebarMenuItem>
-                        <SidebarMenuButton tooltip="Upgrade to Pro" className="gap-x-4 h-10 px-4" onClick={() => router.push('/pricing')}>
-                            <StarIcon className="size-4" />
-                            Upgrade to Pro
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton tooltip="Billing Portal" className="gap-x-4 h-10 px-4" onClick={() => router.push('/billing')}>
+                        <SidebarMenuButton tooltip="Billing Portal" className="gap-x-4 h-10 px-4" onClick={() => authClient.customer.portal()}>
                             <CreditCardIcon className="size-4" />
                             Billing Portal
                         </SidebarMenuButton>
@@ -85,6 +89,6 @@ export const AppSidebar = () => {
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarFooter>
-        </Sidebar>
+        </Sidebar >
     );
 };
