@@ -4,6 +4,7 @@ import prisma from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { polarClient } from "@/lib/polar";
+import superjson from "superjson";
 
 /**
  * Creates the tRPC context for each request.
@@ -24,7 +25,7 @@ const t = initTRPC.context<Context>().create({
     /**
      * @see https://trpc.io/docs/server/data-transformers
      */
-    // transformer: superjson,
+    transformer: superjson,
 });
 
 // Base router and procedure helpers
@@ -33,26 +34,26 @@ export const createCallerFactory = t.createCallerFactory;
 export const baseProcedure = t.procedure;
 export const protectedProcedure = baseProcedure.use(async ({ ctx, next }) => {
     const session = await auth.api.getSession({
-        headers: await headers(),    
+        headers: await headers(),
     });
-    if(!session) {
+    if (!session) {
         throw new TRPCError({
             code: "UNAUTHORIZED",
             message: "Unauthorized",
         });
     }
-    return next({ctx: {...ctx, auth: session}});
+    return next({ ctx: { ...ctx, auth: session } });
 });
 
 export const premiumProcedure = protectedProcedure.use(async ({ ctx, next }) => {
     const customer = await polarClient.customers.getStateExternal({
         externalId: ctx.auth.user.id,
     });
-    if(!customer.activeSubscriptions || customer.activeSubscriptions.length === 0) {
+    if (!customer.activeSubscriptions || customer.activeSubscriptions.length === 0) {
         throw new TRPCError({
             code: "FORBIDDEN",
             message: "Premium required",
         });
     }
-    return next({ctx: {...ctx, customer}});
+    return next({ ctx: { ...ctx, customer } });
 });
