@@ -4,10 +4,10 @@ import { toast } from "sonner"
 import { useWorkflowsParams } from "./use-workflows-params";
 
 // URL STATE -> Use nuqs
-
+ 
 
 // Hook to fetch all workflows using suspense
-export const useSuspenseWorkflow = () => {
+export const useSuspenseWorkflows = () => {
     const trpc = useTRPC();
     const [params] = useWorkflowsParams();
     return useSuspenseQuery(trpc.workflows.getMany.queryOptions(params))
@@ -42,6 +42,30 @@ export const useRemoveWorkflow = () => {
         },
         onError: () => {
             toast.error("Failed to remove workflow");
+        }
+    }));
+}
+
+
+export const useSuspenseWorkflow = (id: string) => {
+    const trpc = useTRPC();
+    return useSuspenseQuery(trpc.workflows.getOne.queryOptions({ id }))
+}
+
+
+// Update a workflow
+export const useUpdateWorkflowName = () => {
+    const trpc = useTRPC();
+    const queryClient = useQueryClient();
+
+    return useMutation(trpc.workflows.updateName.mutationOptions({
+        onSuccess: (data) => {
+            toast.success(`Workflow ${data.name} updated`);
+            queryClient.invalidateQueries(trpc.workflows.getMany.queryOptions({}));
+            queryClient.invalidateQueries(trpc.workflows.getOne.queryFilter({ id: data.id }));
+        },
+        onError: () => {
+            toast.error("Failed to update workflow name");
         }
     }));
 }

@@ -1,13 +1,13 @@
 "use client";
 import { EmptyView, EntityContainer, EntityHeader, EntityItem, EntityList, EntityPagination, EntitySearch, ErrorView, LoadingView } from "@/components/entity-components";
-import { useCreateWorkflow, useRemoveWorkflow, useSuspenseWorkflow } from "../hooks/use-workflow";
+import { useCreateWorkflow, useRemoveWorkflow, useSuspenseWorkflows } from "../hooks/use-workflow";
 import { useUpgradeModal } from "@/hooks/use-upgrade-modal";
 import { useRouter } from "next/navigation";
 import { useWorkflowsParams } from "../hooks/use-workflows-params";
 import { useEntitySearch } from "@/hooks/use-entity-search";
 import type { Workflow } from "@/generated/prisma";
 import { WorkflowIcon } from "lucide-react";
-import { formatDistance, formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 
 export const WorkflowsSearch = () => {
     const [params, setParams] = useWorkflowsParams();
@@ -25,7 +25,7 @@ export const WorkflowsSearch = () => {
 }
 
 export const WorkflowsList = () => {
-    const workflows = useSuspenseWorkflow();
+    const workflows = useSuspenseWorkflows();
     return <EntityList
         items={workflows.data.items}
         renderItem={(workflow) => <WorkflowItem data={workflow} />}
@@ -68,7 +68,7 @@ export const WorkflowsHeader = ({ disabled, isCreating }: { disabled?: boolean, 
 }
 
 export const WorkflowsPagination = () => {
-    const workflows = useSuspenseWorkflow();
+    const workflows = useSuspenseWorkflows();
     const [params, setParams] = useWorkflowsParams();
     return (
         <EntityPagination
